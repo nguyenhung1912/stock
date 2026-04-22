@@ -54,7 +54,7 @@ async function register(req, res) {
       refreshToken,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Register failed:", error);
     return res.status(500).json({ message: "Cannot register user" });
   }
 }
@@ -83,7 +83,7 @@ async function login(req, res) {
       refreshToken,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Login failed:", error);
     return res.status(500).json({ message: "Cannot login" });
   }
 }
@@ -126,7 +126,7 @@ async function logout(req, res) {
 
     return res.json({ message: "Logged out successfully" });
   } catch (error) {
-    console.error(error);
+    console.error("Logout failed:", error);
     return res.status(500).json({ message: "Cannot logout" });
   }
 }
@@ -141,7 +141,7 @@ async function getMe(req, res) {
 
     return res.json(user);
   } catch (error) {
-    console.error(error);
+    console.error("Get current user failed:", error);
     return res.status(500).json({ message: "Cannot get current user" });
   }
 }
