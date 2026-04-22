@@ -1,0 +1,186 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans:
+    "Manrope", "Segoe UI", "Segoe UI Variable", system-ui, sans-serif;
+  --font-display:
+    "Manrope", "Segoe UI", "Segoe UI Variable", system-ui, sans-serif;
+}
+
+@layer base {
+  * {
+    @apply box-border;
+  }
+
+  html {
+    @apply h-full scroll-smooth;
+  }
+
+  body {
+    min-height: 100%;
+    @apply bg-[#f6f5f1] font-sans text-slate-900 antialiased;
+  }
+
+  #root {
+    @apply min-h-screen;
+  }
+
+  a {
+    @apply text-inherit no-underline;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  button {
+    @apply cursor-pointer;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    @apply w-full rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-900 outline-none transition duration-200 placeholder:text-slate-500;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]):focus,
+  select:focus,
+  textarea:focus {
+    @apply border-slate-900 ring-2 ring-slate-900/5;
+  }
+
+  input:not([type="checkbox"]):not([type="radio"]):hover,
+  select:hover,
+  textarea:hover {
+    @apply border-slate-400;
+  }
+
+  select {
+    @apply appearance-none;
+  }
+
+  img,
+  svg {
+    @apply block max-w-full;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f5f9;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 999px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply mx-auto w-full max-w-[1080px];
+  }
+
+  .surface-card {
+    @apply rounded-2xl border border-slate-200 bg-white shadow-[0_12px_32px_rgba(15,23,42,0.05)];
+  }
+
+  .surface-soft {
+    @apply rounded-xl border border-slate-200 bg-[#fafaf8];
+  }
+
+  .page-header {
+    @apply flex flex-col gap-1;
+  }
+
+  .page-eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-600;
+  }
+
+  .page-title {
+    @apply font-display text-2xl font-semibold tracking-[-0.03em] text-slate-900 sm:text-[1.75rem];
+  }
+
+  .page-subtitle {
+    @apply max-w-2xl text-sm leading-6 text-slate-700;
+  }
+
+  .btn-primary {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-xl bg-slate-800 px-4 text-sm font-semibold text-white shadow-sm transition duration-200 hover:bg-slate-700 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 transition duration-200 hover:border-slate-400 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex h-10 items-center justify-center gap-2 rounded-xl border border-transparent bg-transparent px-4 text-sm font-semibold text-slate-700 transition duration-200 hover:bg-slate-100 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-icon {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-lg border border-slate-300 bg-white text-slate-600 transition duration-200 hover:border-slate-400 hover:bg-slate-50 hover:text-slate-900;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-800;
+  }
+
+  .badge-positive {
+    @apply bg-emerald-50 text-emerald-700;
+  }
+
+  .badge-negative {
+    @apply bg-rose-50 text-rose-700;
+  }
+
+  .badge-warning {
+    @apply bg-amber-50 text-amber-700;
+  }
+
+  .field-shell {
+    @apply flex items-center gap-3 rounded-xl border border-slate-300 bg-white px-3 transition duration-200 focus-within:border-slate-700 focus-within:ring-2 focus-within:ring-slate-900/5;
+  }
+
+  .field-shell-invalid {
+    @apply border-rose-300 ring-2 ring-rose-100;
+  }
+
+  .field-icon {
+    @apply shrink-0 text-slate-500;
+  }
+
+  .field-input {
+    @apply border-0 bg-transparent px-0 py-2.5 text-sm text-slate-900 shadow-none focus:ring-0 placeholder:text-slate-500;
+  }
+}
+
+.Toastify__toast-container {
+  width: min(360px, calc(100vw - 24px));
+}
+
+.Toastify__toast {
+  border: 1px solid rgb(226 232 240);
+  border-radius: 16px;
+  background: white;
+  color: rgb(15 23 42);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.Toastify__close-button {
+  color: rgb(100 116 139);
+}
+
+.Toastify__progress-bar {
+  background: rgb(51 65 85);
+}
