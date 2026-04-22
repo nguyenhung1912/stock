@@ -1,5 +1,4 @@
 const jwt = require("jsonwebtoken");
-const { getAccessTokenSecret } = require("../utils/token");
 
 function extractBearerToken(authorizationHeader) {
   if (typeof authorizationHeader !== "string") {
@@ -23,7 +22,7 @@ async function authenticate(req, res, next) {
       return res.status(401).json({ message: "Authorization token is required" });
     }
 
-    req.user = jwt.verify(token, getAccessTokenSecret());
+    req.user = jwt.verify(token, process.env.JWT_SECRET || "change-me");
 
     next();
   } catch (error) {
