@@ -1,15 +1,18 @@
-import { BrowserRouter } from "react-router-dom";
+import { BrowserRouter, HashRouter } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "@/context/AuthContext";
 import AppRouter from "@/routes/AppRouter";
 
+const routerMode = import.meta.env.VITE_ROUTER_MODE?.toLowerCase();
+const Router = routerMode === "hash" ? HashRouter : BrowserRouter;
+
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <Router>
         <AppRouter />
-      </BrowserRouter>
+      </Router>
 
       <ToastContainer
         position="top-right"

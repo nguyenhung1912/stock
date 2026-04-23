@@ -5,6 +5,14 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Stock Market</title>
+    <script>
+      const redirectPath = sessionStorage.getItem("render-spa-redirect");
+
+      if (redirectPath) {
+        sessionStorage.removeItem("render-spa-redirect");
+        window.history.replaceState(null, "", redirectPath);
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>
