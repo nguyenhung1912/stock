@@ -14,7 +14,7 @@ function extractBearerToken(authorizationHeader) {
   return token;
 }
 
-async function authenticate(req, res, next) {
+function authenticate(req, res, next) {
   try {
     const token = extractBearerToken(req.headers.authorization);
 

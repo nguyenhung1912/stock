@@ -5,7 +5,6 @@ const { authenticate } = require("../middlewares/authMiddleware");
 
 router.post("/users", authController.register);
 router.post("/login", authController.login);
-router.post("/refresh-token", authController.refreshToken);
 router.post("/logout", authenticate, authController.logout);
 router.get("/me", authenticate, authController.getMe);
 

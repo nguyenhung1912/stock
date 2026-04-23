@@ -15,11 +15,6 @@ const userSchema = new Schema(
       required: true,
       select: false,
     },
-    refreshToken: {
-      type: String,
-      default: null,
-      select: false,
-    },
   },
   {
     timestamps: true,
@@ -30,7 +25,6 @@ const userSchema = new Schema(
         delete returnedObject._id;
         delete returnedObject.__v;
         delete returnedObject.passwordHash;
-        delete returnedObject.refreshToken;
         return returnedObject;
       },
     },

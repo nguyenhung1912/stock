@@ -2,7 +2,6 @@ import { fetchApi } from "@/services/api";
 
 const normalizeAuthResponse = (data) => ({
   token: data?.accessToken ?? data?.token ?? null,
-  refreshToken: data?.refreshToken ?? null,
   user: data?.user ?? null,
 });
 
@@ -33,11 +32,4 @@ export const authService = {
     }),
 
   getMe: () => fetchApi("/me"),
-
-  refreshToken: (refreshToken) =>
-    fetchApi("/refresh-token", {
-      auth: false,
-      method: "POST",
-      body: JSON.stringify({ refreshToken }),
-    }),
 };

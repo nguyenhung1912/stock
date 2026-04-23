@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { authService } from "@/services/authService";
 
 const AuthContext = createContext(null);
-const emptyAuthState = { token: null, refreshToken: null, user: null };
+const emptyAuthState = { token: null, user: null };
 
 function getStoredUser() {
   try {
@@ -16,31 +16,21 @@ function getStoredUser() {
 
 function getStoredAuth() {
   const token = localStorage.getItem("token");
-  const refreshToken = localStorage.getItem("refreshToken");
 
   return {
     token,
-    refreshToken,
     user: token ? getStoredUser() : null,
   };
 }
 
-function saveAuth(token, refreshToken, user) {
+function saveAuth(token, user) {
   localStorage.setItem("token", token);
-
-  if (refreshToken) {
-    localStorage.setItem("refreshToken", refreshToken);
-  } else {
-    localStorage.removeItem("refreshToken");
-  }
-
   localStorage.setItem("currentUser", JSON.stringify(user));
 }
 
 function clearAuth() {
   localStorage.removeItem("currentUser");
   localStorage.removeItem("token");
-  localStorage.removeItem("refreshToken");
 }
 
 export const AuthProvider = ({ children }) => {
@@ -58,7 +48,7 @@ export const AuthProvider = ({ children }) => {
         const user = await authService.getMe();
 
         if (!ignore) {
-          saveAuth(authState.token, authState.refreshToken, user);
+          saveAuth(authState.token, user);
           setAuthState((prev) => ({ ...prev, user }));
         }
       } catch (error) {
@@ -76,17 +66,16 @@ export const AuthProvider = ({ children }) => {
     return () => {
       ignore = true;
     };
-  }, [authState.refreshToken, authState.token, authState.user]);
+  }, [authState.token, authState.user]);
 
   async function login(username, password) {
     try {
       const data = await authService.login(username, password);
 
       if (data?.token && data?.user) {
-        saveAuth(data.token, data.refreshToken, data.user);
+        saveAuth(data.token, data.user);
         setAuthState({
           token: data.token,
-          refreshToken: data.refreshToken,
           user: data.user,
         });
 

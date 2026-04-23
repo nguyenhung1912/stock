@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useParams } from "react-router-dom";
 import AppLayout from "@/layouts/AppLayout";
 import AuthGuard from "@/guards/AuthGuard";
 import GuestGuard from "@/guards/GuestGuard";
@@ -8,6 +8,12 @@ import ProfilePage from "@/pages/ProfilePage";
 import RegisterPage from "@/pages/RegisterPage";
 import StockDetailsPage from "@/pages/StockDetailsPage";
 import StockListPage from "@/pages/StockListPage";
+
+function StockDetailsRoute() {
+  const { id } = useParams();
+
+  return <StockDetailsPage key={id} />;
+}
 
 export default function AppRouter() {
   return (
@@ -28,7 +34,7 @@ export default function AppRouter() {
           />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/create" element={<CreateStockPage />} />
-          <Route path="/stock/:id" element={<StockDetailsPage />} />
+          <Route path="/stock/:id" element={<StockDetailsRoute />} />
         </Route>
       </Route>
 

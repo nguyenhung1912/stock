@@ -36,12 +36,13 @@ function getVisiblePages(activePage, totalPages) {
 }
 
 export default function StockListPage({ isFavoritePage = false }) {
-  const cachedStocks = stockService.getCachedStocks();
-  const [allStocks, setAllStocks] = useState(() => cachedStocks ?? []);
+  const [initialStocks] = useState(() => stockService.getCachedStocks() ?? []);
+  const hasInitialStocks = initialStocks.length > 0;
+  const [allStocks, setAllStocks] = useState(initialStocks);
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStock, setSelectedStock] = useState(null);
-  const [isLoading, setIsLoading] = useState(!cachedStocks);
+  const [isLoading, setIsLoading] = useState(!hasInitialStocks);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [busyStockId, setBusyStockId] = useState(null);
   const [isSavingStock, setIsSavingStock] = useState(false);
@@ -104,7 +105,7 @@ export default function StockListPage({ isFavoritePage = false }) {
     let ignore = false;
 
     async function loadInitialStocks() {
-      const data = await getStocks({ background: Boolean(cachedStocks?.length) });
+      const data = await getStocks({ background: hasInitialStocks });
 
       if (!ignore && data) {
         setAllStocks(data);
@@ -116,7 +117,7 @@ export default function StockListPage({ isFavoritePage = false }) {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [hasInitialStocks]);
 
   const handleSearchChange = (value) => {
     setSearchText(value);

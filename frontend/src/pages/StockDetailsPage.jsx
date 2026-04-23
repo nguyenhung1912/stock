@@ -20,28 +20,37 @@ export default function StockDetailsPage() {
   const [loading, setLoading] = useState(!cachedStock);
 
   useEffect(() => {
-    setStock(cachedStock);
-    setLoading(!cachedStock);
-
     if (!id) {
       navigate("/stocks");
       return;
     }
 
+    let ignore = false;
+
     const fetchStock = async () => {
       try {
         const data = await stockService.getStockById(id);
-        setStock(data);
+        if (!ignore) {
+          setStock(data);
+        }
       } catch (error) {
         console.error(error);
-        toast.error(error.message || "Failed to load stock details");
-        navigate("/stocks");
+        if (!ignore) {
+          toast.error(error.message || "Failed to load stock details");
+          navigate("/stocks");
+        }
       } finally {
-        setLoading(false);
+        if (!ignore) {
+          setLoading(false);
+        }
       }
     };
 
     fetchStock();
+
+    return () => {
+      ignore = true;
+    };
   }, [id, navigate]);
 
   const quoteData = useMemo(() => {

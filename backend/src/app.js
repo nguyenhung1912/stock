@@ -1,8 +1,5 @@
-const dotenv = require("dotenv");
 const express = require("express");
 const cors = require("cors");
-
-dotenv.config({ quiet: true });
 
 const routes = require("./routes");
 const { notFoundHandler } = require("./middlewares/notFoundHandler");
