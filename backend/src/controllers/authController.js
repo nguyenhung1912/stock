@@ -14,10 +14,23 @@ function getUsername(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function serializeUser(user) {
+  const id =
+    typeof user?.id === "string"
+      ? user.id
+      : typeof user?._id?.toString === "function"
+        ? user._id.toString()
+        : null;
+
+  return {
+    id,
+    username: user?.username ?? "",
+  };
+}
+
 async function saveRefreshToken(user) {
   const refreshToken = generateRefreshToken(user);
-  user.refreshToken = refreshToken;
-  await user.save();
+  await User.findByIdAndUpdate(user.id || user._id, { refreshToken });
   return refreshToken;
 }
 
@@ -42,14 +55,14 @@ async function register(req, res) {
 
     const user = await User.create({
       username,
-      passwordHash: hashPassword(password),
+      passwordHash: await hashPassword(password),
     });
 
     const accessToken = generateAccessToken(user);
     const refreshToken = await saveRefreshToken(user);
 
     return res.status(201).json({
-      user,
+      user: serializeUser(user),
       accessToken,
       refreshToken,
     });
@@ -68,9 +81,11 @@ async function login(req, res) {
       return res.status(400).json({ message: "Username and password are required" });
     }
 
-    const user = await User.findOne({ username }).select("+passwordHash +refreshToken");
+    const user = await User.findOne({ username })
+      .select("_id username +passwordHash")
+      .lean();
 
-    if (!user || !comparePassword(password, user.passwordHash)) {
+    if (!user || !(await comparePassword(password, user.passwordHash))) {
       return res.status(401).json({ message: "Invalid username or password" });
     }
 
@@ -78,7 +93,7 @@ async function login(req, res) {
     const refreshToken = await saveRefreshToken(user);
 
     return res.json({
-      user,
+      user: serializeUser(user),
       accessToken,
       refreshToken,
     });
@@ -97,7 +112,9 @@ async function refreshToken(req, res) {
     }
 
     const payload = verifyRefreshToken(currentRefreshToken);
-    const user = await User.findById(payload.id).select("+refreshToken");
+    const user = await User.findById(payload.id)
+      .select("_id username +refreshToken")
+      .lean();
 
     if (!user || user.refreshToken !== currentRefreshToken) {
       return res.status(401).json({ message: "Invalid refresh token" });
@@ -117,12 +134,7 @@ async function refreshToken(req, res) {
 
 async function logout(req, res) {
   try {
-    const user = await User.findById(req.user.id).select("+refreshToken");
-
-    if (user) {
-      user.refreshToken = null;
-      await user.save();
-    }
+    await User.findByIdAndUpdate(req.user.id, { refreshToken: null });
 
     return res.json({ message: "Logged out successfully" });
   } catch (error) {
@@ -133,13 +145,15 @@ async function logout(req, res) {
 
 async function getMe(req, res) {
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id)
+      .select("_id username")
+      .lean();
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
 
-    return res.json(user);
+    return res.json(serializeUser(user));
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Cannot get current user" });

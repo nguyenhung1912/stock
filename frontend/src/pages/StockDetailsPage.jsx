@@ -14,11 +14,15 @@ import { formatCurrency } from "@/utils/formatters";
 export default function StockDetailsPage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const cachedStock = id ? stockService.getCachedStockById(id) : null;
 
-  const [stock, setStock] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [stock, setStock] = useState(cachedStock);
+  const [loading, setLoading] = useState(!cachedStock);
 
   useEffect(() => {
+    setStock(cachedStock);
+    setLoading(!cachedStock);
+
     if (!id) {
       navigate("/stocks");
       return;

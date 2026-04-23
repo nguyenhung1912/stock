@@ -48,4 +48,6 @@ const stockSchema = new Schema(
   },
 );
 
+stockSchema.index({ updatedAt: -1 });
+
 module.exports = model("Stock", stockSchema);

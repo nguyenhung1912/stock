@@ -24,7 +24,7 @@ export default function RegisterPage() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(registerSchema),
     mode: "onTouched",
@@ -87,8 +87,12 @@ export default function RegisterPage() {
             inputProps={register("confirmPassword")}
           />
 
-          <button type="submit" className="btn-primary mt-2 w-full">
-            <span>Create account</span>
+          <button
+            type="submit"
+            className={`btn-primary mt-2 w-full ${isSubmitting ? "pointer-events-none opacity-70" : ""}`}
+            disabled={isSubmitting}
+          >
+            <span>{isSubmitting ? "Creating..." : "Create account"}</span>
             <FiArrowRight />
           </button>
         </form>

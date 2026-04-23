@@ -1,8 +1,15 @@
 const jwt = require("jsonwebtoken");
 
 function getTokenPayload(user) {
+  const userId =
+    typeof user?.id === "string"
+      ? user.id
+      : typeof user?._id?.toString === "function"
+        ? user._id.toString()
+        : null;
+
   return {
-    id: user.id,
+    id: userId,
     username: user.username,
   };
 }

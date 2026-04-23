@@ -14,6 +14,7 @@ const mobileLabelClass =
 
 export default function StockItem({
   stock,
+  isBusy = false,
   onView,
   onUpdate,
   onDelete,
@@ -47,7 +48,9 @@ export default function StockItem({
           };
 
   return (
-    <div className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 transition sm:grid-cols-2 lg:grid-cols-[minmax(72px,.8fr)_minmax(180px,1.8fr)_minmax(110px,1fr)_minmax(140px,1.1fr)_minmax(96px,.8fr)_150px] lg:items-center lg:rounded-none lg:border-0 lg:bg-transparent lg:px-5">
+    <div
+      className={`grid gap-3 rounded-xl border border-slate-200 bg-white p-4 transition sm:grid-cols-2 lg:grid-cols-[minmax(72px,.8fr)_minmax(180px,1.8fr)_minmax(110px,1fr)_minmax(140px,1.1fr)_minmax(96px,.8fr)_150px] lg:items-center lg:rounded-none lg:border-0 lg:bg-transparent lg:px-5 ${isBusy ? "opacity-70" : ""}`}
+    >
       <div className="grid gap-1">
         <span className={mobileLabelClass}>Code</span>
         <strong className="text-sm font-semibold tracking-[0.01em] text-slate-900">
@@ -91,6 +94,7 @@ export default function StockItem({
             className={`btn-icon ${stock.favorite ? "border-amber-200 bg-amber-50 text-amber-700" : ""}`}
             onClick={() => onToggleFavorite(stock)}
             title={stock.favorite ? "Remove Favorite" : "Add to Favorite"}
+            disabled={isBusy}
           >
             <FiStar />
           </button>
@@ -100,6 +104,7 @@ export default function StockItem({
             className="btn-icon text-slate-600"
             onClick={() => onView(stock)}
             title="View"
+            disabled={isBusy}
           >
             <FiEye />
           </button>
@@ -108,6 +113,7 @@ export default function StockItem({
             className="btn-icon text-slate-600"
             onClick={() => onUpdate(stock)}
             title="Update"
+            disabled={isBusy}
           >
             <FiEdit2 />
           </button>
@@ -116,6 +122,7 @@ export default function StockItem({
             className="btn-icon text-rose-500 hover:text-rose-600"
             onClick={() => onDelete(stock)}
             title="Delete"
+            disabled={isBusy}
           >
             <FiTrash2 />
           </button>

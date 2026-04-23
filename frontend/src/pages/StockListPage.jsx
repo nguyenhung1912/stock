@@ -36,10 +36,15 @@ function getVisiblePages(activePage, totalPages) {
 }
 
 export default function StockListPage({ isFavoritePage = false }) {
-  const [allStocks, setAllStocks] = useState([]);
+  const cachedStocks = stockService.getCachedStocks();
+  const [allStocks, setAllStocks] = useState(() => cachedStocks ?? []);
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStock, setSelectedStock] = useState(null);
+  const [isLoading, setIsLoading] = useState(!cachedStocks);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [busyStockId, setBusyStockId] = useState(null);
+  const [isSavingStock, setIsSavingStock] = useState(false);
 
   const navigate = useNavigate();
   const debouncedSearchText = useDebounce(searchText, 300);
@@ -65,18 +70,30 @@ export default function StockListPage({ isFavoritePage = false }) {
   const paginatedStocks = paginate(filteredStocks, activePage, PAGE_SIZE);
   const visiblePages = getVisiblePages(activePage, totalPages);
 
-  async function getStocks() {
+  async function getStocks({ background = false } = {}) {
     try {
-      return await stockService.getStocks();
+      if (background) {
+        setIsRefreshing(true);
+      } else {
+        setIsLoading(true);
+      }
+
+      return await stockService.getStocks({ force: true });
     } catch (error) {
       console.error(error);
       toast.error(error.message || "Failed to load stocks");
       return null;
+    } finally {
+      if (background) {
+        setIsRefreshing(false);
+      } else {
+        setIsLoading(false);
+      }
     }
   }
 
-  async function loadStocks() {
-    const data = await getStocks();
+  async function refreshStocks() {
+    const data = await getStocks({ background: true });
 
     if (data) {
       setAllStocks(data);
@@ -87,7 +104,7 @@ export default function StockListPage({ isFavoritePage = false }) {
     let ignore = false;
 
     async function loadInitialStocks() {
-      const data = await getStocks();
+      const data = await getStocks({ background: Boolean(cachedStocks?.length) });
 
       if (!ignore && data) {
         setAllStocks(data);
@@ -117,12 +134,20 @@ export default function StockListPage({ isFavoritePage = false }) {
 
     if (window.confirm(`Are you sure you want to delete ${stock.code}?`)) {
       try {
+        setBusyStockId(stock.id);
         await stockService.delete(stock.id);
         toast.success(`Deleted ${stock.code}`);
-        loadStocks();
+        setAllStocks((current) =>
+          current.filter((item) => item.id !== stock.id),
+        );
+        setSelectedStock((current) =>
+          current?.id === stock.id ? null : current,
+        );
       } catch (error) {
         console.error(error);
         toast.error(error.message || "Delete failed!");
+      } finally {
+        setBusyStockId(null);
       }
     }
   };
@@ -131,14 +156,26 @@ export default function StockListPage({ isFavoritePage = false }) {
     if (!stock.id) return;
 
     try {
-      await stockService.patch(stock.id, { favorite: !stock.favorite });
+      setBusyStockId(stock.id);
+      const updatedStock = await stockService.patch(stock.id, {
+        favorite: !stock.favorite,
+      });
       toast.success(
         stock.favorite ? "Removed from favorites" : "Added to favorites",
       );
-      loadStocks();
+      setAllStocks((current) =>
+        current.map((item) =>
+          item.id === updatedStock.id ? updatedStock : item,
+        ),
+      );
+      setSelectedStock((current) =>
+        current?.id === updatedStock.id ? updatedStock : current,
+      );
     } catch (error) {
       console.error(error);
       toast.error(error.message || "Failed to update favorite status!");
+    } finally {
+      setBusyStockId(null);
     }
   };
 
@@ -166,13 +203,20 @@ export default function StockListPage({ isFavoritePage = false }) {
     }
 
     try {
-      await stockService.update(payload.id, payload);
+      setIsSavingStock(true);
+      const updatedStock = await stockService.update(payload.id, payload);
       toast.success("Update successful");
+      setAllStocks((current) =>
+        current.map((item) =>
+          item.id === updatedStock.id ? updatedStock : item,
+        ),
+      );
       setSelectedStock(null);
-      loadStocks();
     } catch (error) {
       console.error(error);
       toast.error(error.message || "Update failed!");
+    } finally {
+      setIsSavingStock(false);
     }
   };
 
@@ -188,7 +232,8 @@ export default function StockListPage({ isFavoritePage = false }) {
         <StockListToolbar
           searchText={searchText}
           totalItems={filteredStocks.length}
-          onRefresh={loadStocks}
+          isRefreshing={isRefreshing}
+          onRefresh={refreshStocks}
           onSearchChange={handleSearchChange}
         />
 
@@ -201,11 +246,21 @@ export default function StockListPage({ isFavoritePage = false }) {
           <div className="text-right">Actions</div>
         </div>
 
-        {paginatedStocks.length > 0 ? (
+        {isLoading ? (
+          <div className="px-5 py-12 text-center">
+            <h3 className="text-base font-semibold text-slate-900">
+              Loading stocks...
+            </h3>
+            <p className="mt-2 text-sm text-slate-600">
+              Fetching the latest stock data from the server.
+            </p>
+          </div>
+        ) : paginatedStocks.length > 0 ? (
           <div className="space-y-3 p-3 lg:space-y-0 lg:divide-y lg:divide-slate-200 lg:p-0">
             {paginatedStocks.map((item) => (
               <StockItem
                 key={item.id}
+                isBusy={busyStockId === item.id}
                 stock={item}
                 onView={handleViewStock}
                 onUpdate={(stock) => setSelectedStock({ ...stock })}
@@ -241,6 +296,7 @@ export default function StockListPage({ isFavoritePage = false }) {
 
       <StockEditModal
         stock={selectedStock}
+        isSaving={isSavingStock}
         onClose={() => setSelectedStock(null)}
         onFieldChange={handleUpdateField}
         onSave={handleSaveUpdate}

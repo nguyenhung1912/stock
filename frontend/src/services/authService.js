@@ -9,6 +9,7 @@ const normalizeAuthResponse = (data) => ({
 export const authService = {
   login: async (username, password) => {
     const data = await fetchApi("/login", {
+      auth: false,
       method: "POST",
       body: JSON.stringify({ username, password }),
     });
@@ -18,6 +19,7 @@ export const authService = {
 
   register: async (user) => {
     const data = await fetchApi("/users", {
+      auth: false,
       method: "POST",
       body: JSON.stringify(user),
     });
@@ -34,6 +36,7 @@ export const authService = {
 
   refreshToken: (refreshToken) =>
     fetchApi("/refresh-token", {
+      auth: false,
       method: "POST",
       body: JSON.stringify({ refreshToken }),
     }),

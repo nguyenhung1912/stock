@@ -21,6 +21,8 @@ export default function CreateStockPage() {
   const [exchanges, setExchanges] = useState([]);
   const [formData, setFormData] = useState(INITIAL_CREATE_STOCK_FORM);
   const [touched, setTouched] = useState({});
+  const [isLoadingExchanges, setIsLoadingExchanges] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const errors = getCreateStockErrors(formData);
 
   useEffect(() => {
@@ -44,6 +46,10 @@ export default function CreateStockPage() {
       } catch (error) {
         console.error(error);
         toast.error(error.message || "Error when loading the exchange list");
+      } finally {
+        if (isMounted) {
+          setIsLoadingExchanges(false);
+        }
       }
     }
 
@@ -94,6 +100,7 @@ export default function CreateStockPage() {
     };
 
     try {
+      setIsSubmitting(true);
       const created = await stockService.create(newStock);
       toast.success(`Create successful: ${created.code}`);
 
@@ -102,6 +109,8 @@ export default function CreateStockPage() {
     } catch (error) {
       console.error(error);
       toast.error(error.message || "Create stock failed!");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -131,6 +140,7 @@ export default function CreateStockPage() {
               onChange={handleChange}
               onBlur={() => handleBlur("name")}
               error={isInvalid("name") ? errors.name : null}
+              disabled={isSubmitting}
             />
 
             <InputField
@@ -143,6 +153,7 @@ export default function CreateStockPage() {
               onChange={handleChange}
               onBlur={() => handleBlur("code")}
               error={isInvalid("code") ? errors.code : null}
+              disabled={isSubmitting}
             />
 
             <InputField
@@ -157,6 +168,7 @@ export default function CreateStockPage() {
               onChange={handleChange}
               onBlur={() => handleBlur("price")}
               error={isInvalid("price") ? errors.price : null}
+              disabled={isSubmitting}
             />
           </div>
 
@@ -164,6 +176,7 @@ export default function CreateStockPage() {
             exchanges={exchanges}
             value={formData.exchange}
             onChange={handleChange}
+            disabled={isLoadingExchanges || isSubmitting}
           />
 
           <label
@@ -180,6 +193,7 @@ export default function CreateStockPage() {
               id="confirmCheck"
               checked={formData.confirm}
               onChange={handleChange}
+              disabled={isSubmitting}
               className="mt-0.5 h-4 w-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900/10"
             />
             <span className="flex flex-col gap-1">
@@ -201,9 +215,19 @@ export default function CreateStockPage() {
           ) : null}
 
           <div className="flex justify-end">
-            <button type="submit" className="btn-primary w-full sm:w-auto">
+            <button
+              type="submit"
+              className={`btn-primary w-full sm:w-auto ${isSubmitting ? "pointer-events-none opacity-70" : ""}`}
+              disabled={isLoadingExchanges || isSubmitting}
+            >
               <FiPlus />
-              <span>Create stock</span>
+              <span>
+                {isSubmitting
+                  ? "Creating..."
+                  : isLoadingExchanges
+                    ? "Loading..."
+                    : "Create stock"}
+              </span>
             </button>
           </div>
         </form>

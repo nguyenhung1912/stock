@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function LoginPage() {
   const [formData, setFormData] = useState({ username: "", password: "" });
   const [touched, setTouched] = useState({ username: false, password: false });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -32,13 +33,19 @@ export default function LoginPage() {
 
     if (!cleanUsername || !cleanPassword) return;
 
-    const result = await login(cleanUsername, cleanPassword);
+    setIsSubmitting(true);
 
-    if (result.success) {
-      toast.success("Login successful!");
-      navigate("/stocks");
-    } else {
-      toast.error(result.message || "Invalid username or password!");
+    try {
+      const result = await login(cleanUsername, cleanPassword);
+
+      if (result.success) {
+        toast.success("Login successful!");
+        navigate("/stocks");
+      } else {
+        toast.error(result.message || "Invalid username or password!");
+      }
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -84,8 +91,12 @@ export default function LoginPage() {
             error={isInvalid("password") ? "Password is required" : null}
           />
 
-          <button type="submit" className="btn-primary mt-2 w-full">
-            <span>Sign in</span>
+          <button
+            type="submit"
+            className={`btn-primary mt-2 w-full ${isSubmitting ? "pointer-events-none opacity-70" : ""}`}
+            disabled={isSubmitting}
+          >
+            <span>{isSubmitting ? "Signing in..." : "Sign in"}</span>
             <FiArrowRight />
           </button>
         </form>

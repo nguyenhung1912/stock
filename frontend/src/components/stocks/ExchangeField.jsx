@@ -1,6 +1,11 @@
 import { FiChevronDown, FiLayers } from "react-icons/fi";
 
-export default function ExchangeField({ exchanges, value, onChange }) {
+export default function ExchangeField({
+  exchanges,
+  value,
+  onChange,
+  disabled = false,
+}) {
   return (
     <div className="grid gap-2">
       <label className="text-sm font-medium text-slate-700" htmlFor="exchange">
@@ -15,6 +20,7 @@ export default function ExchangeField({ exchanges, value, onChange }) {
           className="h-11 w-full rounded-xl border border-slate-300 bg-white pl-10 pr-14 text-sm font-medium text-slate-800 shadow-sm transition duration-200 hover:border-slate-400 focus:border-slate-700 focus:ring-2 focus:ring-slate-900/5"
           value={value}
           onChange={onChange}
+          disabled={disabled}
         >
           {exchanges.map((exchange) => (
             <option key={exchange.id} value={exchange.code}>

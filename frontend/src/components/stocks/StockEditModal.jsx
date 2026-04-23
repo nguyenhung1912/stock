@@ -3,6 +3,7 @@ import InputField from "@/components/ui/InputField";
 
 export default function StockEditModal({
   stock,
+  isSaving = false,
   onClose,
   onFieldChange,
   onSave,
@@ -39,6 +40,7 @@ export default function StockEditModal({
             type="text"
             value={stock.name}
             onChange={(event) => onFieldChange("name", event.target.value)}
+            disabled={isSaving}
           />
 
           <InputField
@@ -47,6 +49,7 @@ export default function StockEditModal({
             type="number"
             value={stock.price}
             onChange={(event) => onFieldChange("price", Number(event.target.value))}
+            disabled={isSaving}
           />
         </div>
 
@@ -55,15 +58,17 @@ export default function StockEditModal({
             type="button"
             className="btn-secondary flex-1 sm:flex-none"
             onClick={onClose}
+            disabled={isSaving}
           >
             Cancel
           </button>
           <button
             type="button"
-            className="btn-primary flex-1 sm:flex-none"
+            className={`btn-primary flex-1 sm:flex-none ${isSaving ? "pointer-events-none opacity-70" : ""}`}
             onClick={onSave}
+            disabled={isSaving}
           >
-            Save
+            {isSaving ? "Saving..." : "Save"}
           </button>
         </div>
       </div>

@@ -9,7 +9,15 @@ const { notFoundHandler } = require("./middlewares/notFoundHandler");
 
 const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    maxAge: 86400,
+    optionsSuccessStatus: 204,
+  }),
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

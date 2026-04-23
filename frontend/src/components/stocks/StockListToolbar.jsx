@@ -3,6 +3,7 @@ import { FiRefreshCw, FiSearch } from "react-icons/fi";
 export default function StockListToolbar({
   searchText,
   totalItems,
+  isRefreshing,
   onRefresh,
   onSearchChange,
 }) {
@@ -21,9 +22,14 @@ export default function StockListToolbar({
 
       <div className="flex items-center gap-2">
         <span className="badge">{totalItems} items</span>
-        <button type="button" className="btn-secondary" onClick={onRefresh}>
-          <FiRefreshCw />
-          <span>Refresh</span>
+        <button
+          type="button"
+          className={`btn-secondary ${isRefreshing ? "pointer-events-none opacity-70" : ""}`}
+          onClick={onRefresh}
+          disabled={isRefreshing}
+        >
+          <FiRefreshCw className={isRefreshing ? "animate-spin" : ""} />
+          <span>{isRefreshing ? "Refreshing..." : "Refresh"}</span>
         </button>
       </div>
     </div>
